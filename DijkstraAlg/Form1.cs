@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -20,6 +21,7 @@ namespace DijkstraAlg
         public static Button endField;
         public static int[,] graph;
         public static int X = 20;
+        public static Thread t;
 
         public ClickBehaviorEnum clickBehavior;
         public Form1()
@@ -53,8 +55,9 @@ namespace DijkstraAlg
                 {
                     Button button = new Button();
                     button.BackColor = Color.White;
-                    button.Size = new Size(20, 20);
+                    button.Size = new Size(22, 22);
                     button.MouseDown += Button_Click;
+                    button.Font = new Font(button.Font.FontFamily, 5);
                     flowLayoutPanel1.Controls.Add(button);
                     if (j == X - 1)
                     {
@@ -102,10 +105,14 @@ namespace DijkstraAlg
                 return;
             }
             Dijkstra dijkstra = new Dijkstra(nodes, X);
-            dijkstra.DijkstraAlg(this);
-
-
+            t = new Thread(() =>
+            {
+                dijkstra.DijkstraAlg(this);
+            });
+            t.Start();
         }
+
+
         private void buttonObstacle_Click(object sender, EventArgs e)
         {
             clickBehavior = ClickBehaviorEnum.Obstacle;
@@ -121,11 +128,13 @@ namespace DijkstraAlg
 
         private void reloadButton_Click(object sender, EventArgs e)
         {
+            t.Abort();
             startField = null;
             endField = null;
             foreach(Node node in nodes)
             {
                 node.button.BackColor = Color.White;
+                node.button.Text = "";
                 node.pathLength = int.MaxValue;
                 node.previousNode = null;
                 node.isProcessed = false;

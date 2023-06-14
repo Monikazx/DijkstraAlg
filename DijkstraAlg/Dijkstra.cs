@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace DijkstraAlg
 {
-
+    
     public class Dijkstra
     {
         int X;
@@ -23,8 +26,6 @@ namespace DijkstraAlg
             this.X = X;
         }
 
-        static int timeLeft;
-
         public void DijkstraAlg(Form form1)
         {
             Node startNode = FindStart();
@@ -32,6 +33,8 @@ namespace DijkstraAlg
             Node endNode = FindEnd();
             List<Node> nodesToProcess = new List<Node>();
             nodesToProcess.Add(startNode);
+            Stopwatch stopWatch = new Stopwatch();
+           
 
 
             // foreach - > while sortoeanie 
@@ -65,28 +68,48 @@ namespace DijkstraAlg
                             tmpNode.previousNode = node;
                         }
 
+                       // tmpNode.button.BackColor = Color.Aqua;
+                        Node tmp = tmpNode;
 
                         if (!tmpNode.isProcessed)
                         {
-                            /*myTimer.Interval = 30;
-                            myTimer.Start();
-                            tmpNode.button.BackColor = Color.Bisque;*/
-                            //tmpNode.button.BackColor = Color.Bisque;
+                            while (tmp.pathLength != 0)
+                            {
+                                tmp.button.BackColor = Color.Aqua;
+                                tmp = tmp.previousNode;
+                            }
+
                             //Task.Delay(3).Wait();
-                            //Thread.Sleep(3);
-                            /*timeLeft = 600;
-                            timer1.Tick += Timer_Tick;*/
-                            Task.Delay(3).Wait();
+                            //Thread.Sleep(1);
+                            stopWatch.Start();
+                            while (stopWatch.ElapsedMilliseconds < 50)
+                            {
+
+                            }
+                            stopWatch.Stop();
+                            stopWatch.Reset();
+                            
                             form1.Invoke((MethodInvoker)delegate
                             {
                                 tmpNode.button.BackColor = Color.Bisque;
+                                tmpNode.button.Text = tmpNode.pathLength.ToString();
+                                
+                                
+
                             });
+                            
                             if (!nodesToProcess.Any(LinqNode => LinqNode == tmpNode))
                             {
                                 nodesToProcess.Add(tmpNode);
                             }
-                               
-                        } 
+                            
+                        }
+                        tmp = tmpNode;
+                        while (tmp.pathLength != 0)
+                        {
+                            tmp.button.BackColor = Color.Bisque;
+                            tmp = tmp.previousNode;
+                        }
                     }
                 }
             }
@@ -127,6 +150,6 @@ namespace DijkstraAlg
             return null;
         }
 
-
+      
     }
 }
